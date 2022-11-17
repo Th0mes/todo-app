@@ -1,21 +1,28 @@
 import { useState } from 'react'
 import { Logo, Clipboard } from './assets'
 
-import { PlusCircleIcon } from '@heroicons/react/24/outline'
+import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { CheckCircleIcon } from '@heroicons/react/24/solid'
 
-import { ToastContainer } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { useTodoStore } from './hooks/useTodos'
+
+import { useTodo } from './hooks/useTodos'
 
 function App() {
   const [inputText, setInputText] = useState<string>('')
-  const { todos, addTodo, removeTodo, toggleCompletedState } = useTodoStore()
+  const { todos, addTodo, removeTodo, toggleCompletedState } = useTodo()
 
   const completedTodos = todos.filter((todo) => todo.completed === true).length
 
   const handleSubmitTodo = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (inputText.length === 0) {
+      toast.error('Desculpa, mas não é possível inserir um todo sem descrição')
+      return
+    }
     addTodo(inputText)
+    setInputText('')
   }
 
   return (
@@ -37,6 +44,7 @@ function App() {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setInputText(e.target.value)
                 }
+                value={inputText}
               />
               <button
                 type="submit"
@@ -59,18 +67,39 @@ function App() {
                   <span className="ml-2 rounded-xl bg-gray-400 px-3 text-white">
                     {todos.length <= 0
                       ? 0
-                      : `${todos.length} de ${completedTodos}`}
+                      : `${completedTodos} de ${todos.length}`}
                   </span>
                 </p>
               </div>
 
               {todos.length ? (
                 todos.map((todo) => (
-                  <div key={todo.id}>
-                    <p>{todo.description}</p>
-                    <button type="button" onClick={() => removeTodo(todo.id)}>
-                      remove
-                    </button>
+                  <div
+                    key={todo.id}
+                    className="grid cursor-pointer grid-cols-12 rounded border border-gray-400 bg-gray-500 p-4"
+                    onClick={() => toggleCompletedState(todo.id)}
+                  >
+                    {todo.completed ? (
+                      <div className="h-4 w-4 rounded-full bg-white">
+                        <CheckCircleIcon className="relative bottom-1 right-1 h-6 w-6 text-purple-dark" />
+                      </div>
+                    ) : (
+                      <div
+                        className={`h-5 w-5 rounded-full border-2 border-blue`}
+                      />
+                    )}
+
+                    <p
+                      className={`col-span-10 text-gray-100 ${
+                        todo.completed && 'text-gray-300  line-through'
+                      }`}
+                    >
+                      {todo.description}
+                    </p>
+                    <TrashIcon
+                      className="flex h-6 w-6 justify-self-end text-gray-300"
+                      onClick={() => removeTodo(todo.id)}
+                    />
                   </div>
                 ))
               ) : (

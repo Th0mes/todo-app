@@ -16,29 +16,27 @@ export interface TodoStore {
   toggleCompletedState: (id: string) => void
 }
 
-export const useTodoStore = create<TodoStore>()(
-  devtools(
-    persist((set) => ({
-      todos: [],
-      addTodo: (description: string) =>
-        set(({ todos }) => ({
-          todos: [
-            ...todos,
-            {
-              id: uuid(),
-              description,
-              completed: false,
-            },
-          ],
-        })),
-      removeTodo: (id: string) =>
-        set(({ todos }) => ({ todos: todos.filter((todo) => todo.id !== id) })),
-      toggleCompletedState: (id: string) =>
-        set(({ todos }) => ({
-          todos: todos.map((todo) =>
-            todo.id === id ? { ...todo, completed: !todo.completed } : todo
-          ),
-        })),
-    }))
-  )
+export const useTodo = create<TodoStore>()(
+  persist((set) => ({
+    todos: [],
+    addTodo: (description: string) =>
+      set(({ todos }) => ({
+        todos: [
+          ...todos,
+          {
+            id: uuid(),
+            description,
+            completed: false,
+          },
+        ],
+      })),
+    removeTodo: (id: string) =>
+      set(({ todos }) => ({ todos: todos.filter((todo) => todo.id !== id) })),
+    toggleCompletedState: (id: string) =>
+      set(({ todos }) => ({
+        todos: todos.map((todo) =>
+          todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        ),
+      })),
+  }))
 )
